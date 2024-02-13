@@ -1,24 +1,40 @@
-import logo from './logo.svg';
-import './App.css';
-
+import { useEffect, useState } from "react";
+import "./App.css";
+import Cart from "./components/Cart/cart";
+import axios from "axios";
 function App() {
+  const [task, setTask] = useState([]);
+  const [pokemons, setPokemons] = useState([]);
+  useEffect(() => {
+    fetch("https://pokeapi.co/api/v2/pokemon/ ")
+      .then((response) => response.json())
+      .then((data) => {
+        setTask(data);
+      })
+      .catch((error) => console.error(error)); 
+
+  }, []);   
+
+  const getPokemons = async () => {
+    task?.results?.forEach(async (item) => {
+      const response = await axios.get(item.url);
+      pokemons.push(response.data);
+    });
+  };
+  useEffect(() => {
+    getPokemons();
+  }, [task]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <div className="wraper">
+        {" "}
+        {pokemons?.map((item) => {
+          return <Cart
+          art key={item.id} item={item} />;
+        })}
+      </div>
+    </>
   );
 }
 
